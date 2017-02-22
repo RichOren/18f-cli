@@ -7,10 +7,12 @@ module.exports = Generator.extend({
   prompting: function () {
     return this.prompt(
       sharedConfig.promptsFor(this.config,
+                              sharedConfig.repoNamePrompt,
                               sharedConfig.primaryLanguagePrompt,
                               sharedConfig.runCommandPrompt)
     ).then(
       sharedConfig.saveResultsTo(this.config,
+                                 sharedConfig.repoNamePrompt,
                                  sharedConfig.primaryLanguagePrompt,
                                  sharedConfig.runCommandPrompt)
     );
@@ -21,10 +23,10 @@ module.exports = Generator.extend({
         'Cloud.gov Manifests': ['Procfile\'s "run" command']
       });
     }
-    this.fs.copyTpl(
-        this.templatePath(this.config.get('primaryLanguage') + '/*'),
-        this.destinationPath(),
-        {runCommand: this.config.get('runCommand')}
-    );
+    todo.add(this.config, this.fs, {'Cloud.gov Manifests': [
+      'Run `cf create-service aws-rds medium-psql database` in each env'
+    ]});
+    this.fs.copyTpl(this.templatePath('**'), this.destinationPath(),
+                    this.config.getAll());
   }
 });
